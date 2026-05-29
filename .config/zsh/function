@@ -7,8 +7,44 @@ function y() {
   rm -f -- "$tmp"
 }
 
+_zsh_editor() {
+  emulate -L zsh
+  local -a editor_cmd
+
+  if [[ -n ${EDITOR:-} ]]; then
+    editor_cmd=(${(z)EDITOR})
+    if (( $#editor_cmd && $+commands[$editor_cmd[1]] )); then
+      print -r -- "$EDITOR"
+      return 0
+    fi
+  fi
+
+  for editor_cmd in nvim vim vi nano; do
+    if (( $+commands[$editor_cmd] )); then
+      print -r -- "$editor_cmd"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+_open_in_zsh_editor() {
+  emulate -L zsh
+  local editor=$(_zsh_editor)
+  local -a editor_cmd
+
+  if [[ -z $editor ]]; then
+    print -u2 "No editor found. Install nvim, vim, vi, or nano."
+    return 127
+  fi
+
+  editor_cmd=(${(z)editor})
+  command "${editor_cmd[@]}" "$1"
+}
+
 _edit_zsh_config_file() {
-  "$EDITOR" "$ZSH_CONFIG_DIR/$1"
+  _open_in_zsh_editor "$ZSH_CONFIG_DIR/$1"
 }
 
 function config() {
@@ -44,7 +80,7 @@ EOF
   esac
 }
 
-function config/zshrc() { "$EDITOR" "$HOME/.zshrc"; }
+function config/zshrc() { _open_in_zsh_editor "$HOME/.zshrc"; }
 function config-dir() { cd "$ZSH_CONFIG_DIR"; }
 function config/environment() { _edit_zsh_config_file environment; }
 function config/tools() { _edit_zsh_config_file tools; }
