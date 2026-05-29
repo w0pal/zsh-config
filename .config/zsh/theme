@@ -17,6 +17,37 @@ _prompt_now_ms() {
   printf '%.0f' $(( EPOCHREALTIME * 1000 ))
 }
 
+_prompt_container_name() {
+  local name key value
+
+  if [[ -n ${DISTROBOX_NAME:-} ]]; then
+    name=$DISTROBOX_NAME
+  elif [[ -n ${CONTAINER_NAME:-} ]]; then
+    name=$CONTAINER_NAME
+  elif [[ -n ${CONTAINER_ID:-} ]]; then
+    name=$CONTAINER_ID
+  elif [[ -n ${container:-} && ${container:l} != "0" && ${container:l} != "false" ]]; then
+    name=${HOSTNAME:-${(%):-%m}}
+  fi
+
+  if [[ -z $name && -r /run/.containerenv ]]; then
+    while IFS='=' read -r key value; do
+      [[ $key == name ]] || continue
+      name=${value%\"}
+      name=${name#\"}
+      name=${name%\'}
+      name=${name#\'}
+      break
+    done < /run/.containerenv
+  fi
+
+  if [[ -z $name && -e /.dockerenv ]]; then
+    name=${HOSTNAME:-${(%):-%m}}
+  fi
+
+  [[ -n $name ]] && printf '%s' "${name//\%/%%}"
+}
+
 preexec() {
   timer=$(_prompt_now_ms)
 }
@@ -49,7 +80,14 @@ precmd() {
     USER_FMT="%F{red}%n%f"
   fi
 
-  PS1="%B${USER_FMT}@%F{cyan}%m%k %(?.%F{green}√.%F{red}?%?)%f %F{yellow}${elapsed}%f %B%F{blue}%~%b%f%k${vcs_info_msg_0_} "$'\n'"%# "
+  local HOST_FMT="%F{cyan}%m%k"
+  local CONTAINER_FMT=""
+  local CONTAINER_PROMPT_NAME=$(_prompt_container_name)
+  if [[ -n $CONTAINER_PROMPT_NAME ]]; then
+    CONTAINER_FMT=" %F{magenta}[${CONTAINER_PROMPT_NAME}]%k"
+  fi
+
+  PS1="%B${USER_FMT}@${HOST_FMT}${CONTAINER_FMT} %(?.%F{green}√.%F{red}?%?)%f %F{yellow}${elapsed}%f %B%F{blue}%~%b%f%k${vcs_info_msg_0_} "$'\n'"%# "
 }
 
 # vim: set ts=2 sw=2 et:
