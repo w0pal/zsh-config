@@ -20,6 +20,8 @@ Zsh config commands:
   config --help          Show this help
   config-dir             Go to ~/.config/zsh
   reload                 Reload ~/.zshrc
+  zshcfg                 Run git for the zsh config repo
+  zshlg                  Open lazygit for the zsh config repo
 
 Config files:
   config/zshrc           Edit ~/.zshrc

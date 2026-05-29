@@ -10,3 +10,5 @@ alias reload="source ~/.zshrc"
 alias ssh='TERM=xterm-256color ssh'
 alias dev-image="distrobox enter dev-image"
 alias v='nvim'
+alias zshcfg='git --git-dir=$HOME/.zsh-config.git --work-tree=$HOME'
+alias zshlg='lazygit --git-dir=$HOME/.zsh-config.git --work-tree=$HOME'
