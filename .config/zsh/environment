@@ -1,0 +1,10 @@
+# --- PATHS & ENVIRONMENT ---
+export EDITOR="nvim"
+export SDKMAN_DIR="$HOME/.sdkman"
+export FLYCTL_INSTALL="/home/naufal/.fly"
+
+# Combine PATH exports for speed
+export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$HOME/.sdkman/bin:$HOME/.nexus/bin:$HOME/.cargo/bin:$FLYCTL_INSTALL/bin:$HOME/.npm-global/bin:$PATH"
+
+# Added by Antigravity CLI installer
+export PATH="/var/home/w0pal/.local/bin:$PATH"
